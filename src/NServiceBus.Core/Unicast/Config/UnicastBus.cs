@@ -21,7 +21,7 @@ namespace NServiceBus.Features
         static EndpointInstance GetEndpointInstanceName(ReadOnlySettings settings)
         {
             var userDiscriminator = settings.GetOrDefault<string>("EndpointInstanceDiscriminator");
-            var boundInstance = settings.Get<TransportDefinition>().BindToLocalEndpoint(new EndpointInstance(settings.EndpointName(), userDiscriminator), settings);
+            var boundInstance = settings.Get<TransportInfrastructure>().BindToLocalEndpoint(new EndpointInstance(settings.EndpointName(), userDiscriminator), settings);
             return boundInstance;
         }
 

@@ -41,7 +41,7 @@
 
                 public Task Start(IMessageSession session)
                 {
-                    Context.Address = ReadOnlySettings.Get<TransportDefinition>().ToTransportAddress(ReadOnlySettings.RootLogicalAddress());
+                    Context.Address = ReadOnlySettings.Get<TransportInfrastructure>().ToTransportAddress(ReadOnlySettings.RootLogicalAddress());
                     Context.EndpointName = ReadOnlySettings.EndpointName().ToString();
                     return Task.FromResult(0);
                 }
