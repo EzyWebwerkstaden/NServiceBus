@@ -47,7 +47,8 @@
             var headers = new Dictionary<string, string>();
 
             return new TransportReceiveContext(
-                new IncomingMessage(messageId, headers, Stream.Null), 
+                new IncomingMessage(messageId, headers, Stream.Null),
+                "InputQueue", 
                 new TransportTransaction(), 
                 new CancellationTokenSource(), 
                 null);

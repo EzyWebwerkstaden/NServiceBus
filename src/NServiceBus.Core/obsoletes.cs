@@ -1079,7 +1079,7 @@ namespace NServiceBus.Settings
         [ObsoleteEx(
             TreatAsErrorFromVersion = "6",
             RemoveInVersion = "7",
-            ReplacementTypeOrMember = "ScaleOutSettings.InstanceDiscriminator()")]
+            ReplacementTypeOrMember = "BusConfiguration.EndpointInstanceId")]
         public void UniqueQueuePerEndpointInstance(string discriminator)
         {
             throw new NotImplementedException();

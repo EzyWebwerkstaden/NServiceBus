@@ -136,7 +136,7 @@
 
         ITransportReceiveContext CreateContext(string messageId, CancellationTokenSource cancellationTokenSource = null)
         {
-            return new TransportReceiveContext(new IncomingMessage(messageId, new Dictionary<string, string>(), new MemoryStream()), null, cancellationTokenSource ?? new CancellationTokenSource(), new RootContext(null, null));
+            return new TransportReceiveContext(new IncomingMessage(messageId, new Dictionary<string, string>(), new MemoryStream()), "InputQueue", null, cancellationTokenSource ?? new CancellationTokenSource(), new RootContext(null, null));
         }
     }
 }

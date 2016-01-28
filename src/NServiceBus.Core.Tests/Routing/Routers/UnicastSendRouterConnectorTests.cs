@@ -15,7 +15,7 @@
         [Test]
         public async Task Should_set_messageintent_to_send()
         {
-            var router = new UnicastSendRouterConnector("fake", new Router(), new DistributionPolicy());
+            var router = new UnicastSendRouterConnector("fake", "fake", new Router(), new DistributionPolicy());
             var context = new FakeContext();
 
             await router.Invoke(context, ctx => TaskEx.CompletedTask);

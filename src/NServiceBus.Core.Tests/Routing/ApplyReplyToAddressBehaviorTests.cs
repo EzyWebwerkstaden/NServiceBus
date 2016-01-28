@@ -11,19 +11,105 @@
     public class ApplyReplyToAddressBehaviorTests
     {
         [Test]
-        public async Task Should_set_the_reply_to_header_to_configured_address()
+        public async Task Should_use_public_return_address_if_specified()
         {
-            var behavior = new ApplyReplyToAddressBehavior("MyAddress");
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", "PublicAddress");
+            var context = CreateContext();
+
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToAnyInstance = true;
+
+            await behavior.Invoke(context, () => TaskEx.CompletedTask);
+
+            Assert.AreEqual("PublicAddress", context.Headers[Headers.ReplyToAddress]);
+        }
+
+        static OutgoingLogicalMessageContext CreateContext()
+        {
             var context = new OutgoingLogicalMessageContext(
                 Guid.NewGuid().ToString(),
                 new Dictionary<string, string>(),
                 new OutgoingLogicalMessage(new MyMessage()),
-                new RoutingStrategy[] { },
+                new RoutingStrategy[]
+                {
+                },
                 new RootContext(null, null));
+            return context;
+        }
+
+        [Test]
+        public async Task Should_default_to_setting_the_reply_to_header_to_this_endpoint()
+        {
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
+            var context = CreateContext();
 
             await behavior.Invoke(context, () => TaskEx.CompletedTask);
 
-            Assert.AreEqual("MyAddress", context.Headers[Headers.ReplyToAddress]);
+            Assert.AreEqual("MyEndpoint", context.Headers[Headers.ReplyToAddress]);
+        }
+
+        [Test]
+        public async Task Should_set_the_reply_to_header_to_this_endpoint()
+        {
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
+            var context = CreateContext();
+
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToAnyInstance = true;
+
+            await behavior.Invoke(context, () => TaskEx.CompletedTask);
+
+            Assert.AreEqual("MyEndpoint", context.Headers[Headers.ReplyToAddress]);
+        }
+
+        [Test]
+        public async Task Should_set_the_reply_to_header_to_this_instance()
+        {
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
+            var context = CreateContext();
+
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToThisInstance = true;
+
+            await behavior.Invoke(context, () => TaskEx.CompletedTask);
+
+            Assert.AreEqual("MyInstance", context.Headers[Headers.ReplyToAddress]);
+        }
+
+        [Test]
+        public async Task Should_throw_when_trying_to_route_replies_to_this_instance_when_no_instance_id_is_used()
+        {
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", null, null);
+            var context = CreateContext();
+
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToThisInstance = true;
+
+            try
+            {
+                await behavior.Invoke(context, () => TaskEx.CompletedTask);
+                Assert.Fail("Expected exception");
+            }
+            catch (Exception)
+            {
+                Assert.Pass();
+            }
+        }
+
+        [Test]
+        public async Task Should_throw_when_conflicting_settings_are_specified()
+        {
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
+            var context = CreateContext();
+
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToThisInstance = true;
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToAnyInstance = true;
+
+            try
+            {
+                await behavior.Invoke(context, () => TaskEx.CompletedTask);
+                Assert.Fail("Expected exception");
+            }
+            catch (Exception)
+            {
+                Assert.Pass();
+            }
         }
 
         class MyMessage

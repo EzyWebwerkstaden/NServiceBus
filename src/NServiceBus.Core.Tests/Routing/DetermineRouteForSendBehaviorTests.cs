@@ -37,10 +37,10 @@
         [Test]
         public async Task Should_route_to_local_endpoint_if_requested_so()
         {
-            var behavior = InitializeBehavior("MyLocalAddress");
+            var behavior = InitializeBehavior(sharedQueue: "MyLocalAddress");
             var options = new SendOptions();
 
-            options.RouteToLocalEndpointInstance();
+            options.RouteToThisEndpoint();
 
             var context = CreateContext(options);
 
@@ -52,6 +52,101 @@
             });
             
             Assert.AreEqual("MyLocalAddress", addressTag.Destination);
+        }
+
+        [Test]
+        public async Task Should_route_to_local_instance_if_requested_so()
+        {
+            var behavior = InitializeBehavior(sharedQueue: "MyLocalAddress", instanceSpecificQueue: "MyInstance");
+            var options = new SendOptions();
+
+            options.RouteToThisInstance();
+
+            var context = CreateContext(options);
+
+            UnicastAddressTag addressTag = null;
+            await behavior.Invoke(context, c =>
+            {
+                addressTag = (UnicastAddressTag) c.RoutingStrategies.Single().Apply(new Dictionary<string, string>());
+                return TaskEx.CompletedTask;
+            });
+            
+            Assert.AreEqual("MyInstance", addressTag.Destination);
+        }
+
+        [Test]
+        public async Task Should_throw_if_requested_to_route_to_local_instance_and_instance_has_no_specific_queue()
+        {
+            var behavior = InitializeBehavior(sharedQueue: "MyLocalAddress", instanceSpecificQueue: null);
+
+            try
+            {
+                var options = new SendOptions();
+
+                options.RouteToThisInstance();
+
+                var context = CreateContext(options);
+                await behavior.Invoke(context, c => TaskEx.CompletedTask);
+                Assert.Fail("RouteToThisInstance");
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+
+        [Test]
+        public async Task Should_throw_if_invalid_route_combinations_are_used()
+        {
+            var behavior = InitializeBehavior(sharedQueue: "MyLocalAddress", instanceSpecificQueue: "MyInstance");
+            
+            try
+            {
+                var options = new SendOptions();
+
+                options.RouteToThisInstance();
+                options.SetDestination("Destination");
+
+                var context = CreateContext(options);
+                await behavior.Invoke(context, c => TaskEx.CompletedTask);
+                Assert.Fail("RouteToThisInstance+SetDestination");
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            try
+            {
+                var options = new SendOptions();
+
+                options.RouteToThisEndpoint();
+                options.SetDestination("Destination");
+
+                var context = CreateContext(options);
+                await behavior.Invoke(context, c => TaskEx.CompletedTask);
+                Assert.Fail("RouteToThisEndpoint+SetDestination");
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            try
+            {
+                var options = new SendOptions();
+
+                options.RouteToThisEndpoint();
+                options.RouteToThisInstance();
+
+                var context = CreateContext(options);
+                await behavior.Invoke(context, c => TaskEx.CompletedTask);
+                Assert.Fail("RouteToThisEndpoint+RouteToThisInstance");
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
         [Test]
@@ -104,13 +199,15 @@
         }
 
 
-        static UnicastSendRouterConnector InitializeBehavior(string localAddress = null,
+        static UnicastSendRouterConnector InitializeBehavior(
+            string sharedQueue = null,
+            string instanceSpecificQueue = null,
             FakeRoutingStrategy strategy = null)
         {
             var metadataRegistry = new MessageMetadataRegistry(new Conventions());
             metadataRegistry.RegisterMessageType(typeof(MyMessage));
             metadataRegistry.RegisterMessageType(typeof(MessageWithoutRouting));
-            return new UnicastSendRouterConnector(localAddress, strategy ?? new FakeRoutingStrategy(), new DistributionPolicy());
+            return new UnicastSendRouterConnector(sharedQueue, instanceSpecificQueue, strategy ?? new FakeRoutingStrategy(), new DistributionPolicy());
         }
 
         class FakeRoutingStrategy : IUnicastRouter

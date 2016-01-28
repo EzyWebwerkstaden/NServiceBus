@@ -130,7 +130,7 @@
             return new TransportReceiveContext(new IncomingMessage(messageId, new Dictionary<string, string>
             {
                 {Headers.Retries, currentRetryCount.ToString()}
-            }, new MemoryStream(messageBody ?? new byte[0])), null, new CancellationTokenSource(),  new RootContext(null, new FakePipelineCache(pipeline)));
+            }, new MemoryStream(messageBody ?? new byte[0])), "InputQueue", null, new CancellationTokenSource(),  new RootContext(null, new FakePipelineCache(pipeline)));
         }
     }
 

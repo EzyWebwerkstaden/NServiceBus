@@ -23,10 +23,13 @@
             var masterNodeControlAddress = context.Settings.Get<string>("LegacyDistributor.ControlAddress");
             var capacity = context.Settings.Get<int>("LegacyDistributor.Capacity");
 
+            context.Container.ConfigureComponent(b => new ReadyMessageSender(b.Build<IDispatchMessages>(), context.Settings.LocalAddress(), capacity, masterNodeControlAddress), DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent(b => new ProcessedMessageCounterBehavior(b.Build<ReadyMessageSender>()), DependencyLifecycle.SingleInstance);
 
-            context.RegisterStartupTask(b => new ReadyMessageSender(b.Build<IDispatchMessages>(), context.Settings.LocalAddress(), capacity, masterNodeControlAddress));
+            context.RegisterStartupTask(b => b.Build<ReadyMessageSender>());
             context.Pipeline.Register("ProcessedMessageCounterBehavior", typeof(ProcessedMessageCounterBehavior), "Counts messages processed by the worker.");
+            context.Pipeline.Register("DetectDistributorDistributorBehavior", new DetectDistributorDistributorBehavior(), "Detects if message is coming from a distributor.");
+            context.Pipeline.Register(new ApplyDistributorReplyToAddressBehavior.Registration(context.Settings.Get<string>("LegacyDistributor.Address")));
         }
     }
 }

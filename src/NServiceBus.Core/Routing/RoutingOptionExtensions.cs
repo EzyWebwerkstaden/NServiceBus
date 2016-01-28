@@ -14,8 +14,9 @@
         {
             Guard.AgainstNullAndEmpty(nameof(destination), destination);
 
-            option.Context.GetOrCreate<UnicastSendRouterConnector.State>()
-                .ExplicitDestination = destination;
+            var state = option.Context.GetOrCreate<UnicastSendRouterConnector.State>();
+            state.Option = UnicastSendRouterConnector.RouteOption.ExplicitDestination;
+            state.ExplicitDestination = destination;
         }
 
         /// <summary>
@@ -32,13 +33,76 @@
         }
 
         /// <summary>
-        /// Routes this message to the local endpoint instance.
+        /// Routes this message to any instance of this endpoint.
         /// </summary>
         /// <param name="option">Context being extended.</param>
-        public static void RouteToLocalEndpointInstance(this SendOptions option)
+        public static void RouteToThisEndpoint(this SendOptions option)
         {
             option.Context.GetOrCreate<UnicastSendRouterConnector.State>()
-                .RouteToLocalInstance = true;
+                .Option = UnicastSendRouterConnector.RouteOption.RouteToAnyInstanceOfThisEndpoint;
+        }
+
+        /// <summary>
+        /// Routes this message to this endpoint instance.
+        /// </summary>
+        /// <param name="option">Context being extended.</param>
+        public static void RouteToThisInstance(this SendOptions option)
+        {
+            option.Context.GetOrCreate<UnicastSendRouterConnector.State>()
+                .Option = UnicastSendRouterConnector.RouteOption.RouteToThisInstance;
+        }
+
+        /// <summary>
+        /// Routes this message to a specific instance of a destination endpoint.
+        /// </summary>
+        /// <param name="option">Context being extended.</param>
+        /// <param name="instanceId">ID of destination instance.</param>
+        public static void RouteToThisSpecificInstance(this SendOptions option, string instanceId)
+        {
+            Guard.AgainstNull(nameof(instanceId), instanceId);
+            var state = option.Context.GetOrCreate<UnicastSendRouterConnector.State>();
+            state.Option = UnicastSendRouterConnector.RouteOption.RouteToSpecificInstance;
+            state.SpecificInstance = instanceId;
+        }
+
+        /// <summary>
+        /// Instructs the receiver to route the reply for this message to this instance.
+        /// </summary>
+        /// <param name="option">Context being extended.</param>
+        public static void RouteReplyToThisInstance(this SendOptions option)
+        {
+            option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
+                .RouteReplyToThisInstance = true;
+        }
+        
+        /// <summary>
+        /// Instructs the receiver to route the reply for this message to any instance of this endpoint.
+        /// </summary>
+        /// <param name="option">Context being extended.</param>
+        public static void RouteReplyToAnyInstance(this SendOptions option)
+        {
+            option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
+                .RouteReplyToAnyInstance = true;
+        }
+
+        /// <summary>
+        /// Instructs the receiver to route the reply for this message to this instance.
+        /// </summary>
+        /// <param name="option">Context being extended.</param>
+        public static void RouteReplyToThisInstance(this ReplyOptions option)
+        {
+            option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
+                .RouteReplyToThisInstance = true;
+        }
+        
+        /// <summary>
+        /// Instructs the receiver to route the reply for this message to any instance of this endpoint.
+        /// </summary>
+        /// <param name="option">Context being extended.</param>
+        public static void RouteReplyToAnyInstance(this ReplyOptions option)
+        {
+            option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
+                .RouteReplyToAnyInstance = true;
         }
     }
 }

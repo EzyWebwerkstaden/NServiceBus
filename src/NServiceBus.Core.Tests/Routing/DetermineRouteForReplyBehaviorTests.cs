@@ -30,7 +30,7 @@
                         {
                             {Headers.ReplyToAddress, "ReplyAddressOfIncomingMessage"}
                         },
-                        new MemoryStream()), null, new CancellationTokenSource(),
+                        new MemoryStream()), "InputQueue", null, new CancellationTokenSource(),
                     new RootContext(null, null)));
 
             UnicastAddressTag addressTag = null;
@@ -56,7 +56,7 @@
                     new IncomingMessage(
                         "id",
                         new Dictionary<string, string>(),
-                        new MemoryStream()), null, new CancellationTokenSource(),
+                        new MemoryStream()), "InputQueue", null, new CancellationTokenSource(),
                     new RootContext(null, null)));
 
             Assert.That(async () => await behavior.Invoke(context, _ => TaskEx.CompletedTask), Throws.InstanceOf<Exception>().And.Message.Contains(typeof(MyReply).FullName));
