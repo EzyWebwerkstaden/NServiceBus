@@ -82,9 +82,9 @@
 
             if (canReceive)
             {
-                string publicReturnAddress;
-                context.Settings.TryGet("PublicReturnAddress", out publicReturnAddress);
-                context.Pipeline.Register("ApplyReplyToAddress", new ApplyReplyToAddressBehavior(context.Settings.LocalAddress(), context.Settings.InstanceSpecificQueue(), publicReturnAddress), "Applies the public reply to address to outgoing messages");
+                var publicReturnAddress = context.Settings.GetOrDefault<string>("PublicReturnAddress");
+                var distributorAddress = context.Settings.GetOrDefault<string>("LegacyDistributor.Address");
+                context.Pipeline.Register("ApplyReplyToAddress", new ApplyReplyToAddressBehavior(context.Settings.LocalAddress(), context.Settings.InstanceSpecificQueue(), publicReturnAddress, distributorAddress), "Applies the public reply to address to outgoing messages");
 
                 if (outboundRoutingPolicy.Publishes == OutboundRoutingType.Unicast)
                 {

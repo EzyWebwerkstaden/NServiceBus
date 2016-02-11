@@ -110,7 +110,6 @@
     <Compile Include="Pipeline\PipelineCache.cs" />
     <Compile Include="Pipeline\StageForkConnector.cs" />
     <Compile Include="Pipeline\ConnectorContextExtensions.cs" />
-    <Compile Include="Routing\Legacy\ApplyDistributorReplyToAddressBehavior.cs" />
     <Compile Include="Routing\Legacy\DetectDistributorDistributorBehavior.cs" />
     <Compile Include="Serialization\SerializationFeature.cs" />
     <Compile Include="Serializers\XML\XmlSerialization.cs" />

@@ -13,7 +13,7 @@
         [Test]
         public async Task Should_use_public_return_address_if_specified()
         {
-            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", "PublicAddress");
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", "PublicAddress", null);
             var context = CreateContext();
 
             await behavior.Invoke(context, () => TaskEx.CompletedTask);
@@ -37,7 +37,7 @@
         [Test]
         public async Task Should_default_to_setting_the_reply_to_header_to_this_endpoint()
         {
-            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null, null);
             var context = CreateContext();
 
             await behavior.Invoke(context, () => TaskEx.CompletedTask);
@@ -48,7 +48,7 @@
         [Test]
         public async Task Should_set_the_reply_to_header_to_this_endpoint()
         {
-            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null, null);
             var context = CreateContext();
 
             context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToAnyInstanceOfThisEndpoint;
@@ -61,7 +61,7 @@
         [Test]
         public async Task Should_set_the_reply_to_header_to_this_instance()
         {
-            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null, null);
             var context = CreateContext();
 
             context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
@@ -72,9 +72,24 @@
         }
 
         [Test]
+        public async Task Should_set_the_reply_to_distributor_address_when_message_comes_from_a_distributor()
+        {
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", "MyPublicAddress", "MyDistributor");
+            var context = CreateContext();
+
+            var state = context.GetOrCreate<ApplyReplyToAddressBehavior.State>();
+            state.FromDistributor = true;
+            state.Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
+
+            await behavior.Invoke(context, () => TaskEx.CompletedTask);
+
+            Assert.AreEqual("MyDistributor", context.Headers[Headers.ReplyToAddress]);
+        }
+
+        [Test]
         public async Task Should_throw_when_trying_to_route_replies_to_this_instance_when_no_instance_id_is_used()
         {
-            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", null, null);
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", null, null, null);
             var context = CreateContext();
 
             context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
@@ -93,7 +108,7 @@
         [Test]
         public async Task Should_throw_when_conflicting_settings_are_specified()
         {
-            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
+            var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null, null);
             var context = CreateContext();
 
             try

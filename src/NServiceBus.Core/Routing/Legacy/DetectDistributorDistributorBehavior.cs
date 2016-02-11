@@ -8,9 +8,9 @@
     {
         public override Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
         {
-            if (context.Headers.ContainsKey("NServiceBus.Distributor.WorkerSessionId"))
+            if (context.Headers.ContainsKey(LegacyDistributorHeaders.WorkerSessionId))
             {
-                context.Extensions.GetOrCreate<ApplyDistributorReplyToAddressBehavior.State>().FromDistributor = true;
+                context.Extensions.GetOrCreate<ApplyReplyToAddressBehavior.State>().FromDistributor = true;
             }
             return next();
         }

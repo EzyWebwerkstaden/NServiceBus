@@ -7,23 +7,31 @@
 
     class ApplyReplyToAddressBehavior : Behavior<IOutgoingLogicalMessageContext>
     {
-        public ApplyReplyToAddressBehavior(string sharedQueue, string instanceSpecificQueue, string publicReturnAddress)
+        public ApplyReplyToAddressBehavior(string sharedQueue, string instanceSpecificQueue, string publicReturnAddress, string distributorAddress)
         {
             this.sharedQueue = sharedQueue;
             this.instanceSpecificQueue = instanceSpecificQueue;
             this.publicReturnAddress = publicReturnAddress;
+            this.distributorAddress = distributorAddress;
         }
 
         public override Task Invoke(IOutgoingLogicalMessageContext context, Func<Task> next)
         {
-            var state = context.Extensions.GetOrCreate<State>();
+            var state = context.Extensions.GetOrCreate<State>();            
             if (state.Option == RouteOption.RouteToThisInstance && instanceSpecificQueue == null)
             {
                 throw new InvalidOperationException("Cannot route a reply to this specific instance because endpoint instance ID was not provided by either host, a plugin or user. You can specify it via BusConfiguration.EndpointInstanceId, use a specific host or plugin.");
             }
             context.Headers[Headers.ReplyToAddress] = ApplyUserOverride(publicReturnAddress ?? GetDefaultReplyToValue(context), state);
+
+            //Legacy distributor logic
+            if (state.FromDistributor)
+            {
+                context.Headers[Headers.ReplyToAddress] = distributorAddress;
+            }
             return next();
         }
+        
 
         string ApplyUserOverride(string replyTo, State state)
         {
@@ -53,7 +61,7 @@
         string sharedQueue;
         string instanceSpecificQueue;
         string publicReturnAddress;
-
+        string distributorAddress;
 
         public class State
         {
@@ -73,6 +81,9 @@
             }
 
             public string ExplicitDestination { get; set; }
+            
+            //Legacy distributor
+            public bool FromDistributor { get; set; }
         }
 
         public enum RouteOption
