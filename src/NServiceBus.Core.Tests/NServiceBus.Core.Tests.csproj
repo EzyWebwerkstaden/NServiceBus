@@ -108,11 +108,11 @@
     <Compile Include="ContextBagTests.cs" />
     <Compile Include="ContextHelpers.cs" />
     <Compile Include="DelayedDelivery\RouteDeferredMessageToTimeoutManagerBehaviorTests.cs" />
+    <Compile Include="Encryption\When_decrypting_a_member_that_is_missing_encryption_data.cs" />
+    <Compile Include="Encryption\When_sending_a_message_with_2x_compatibility_disabled.cs" />
     <Compile Include="DelayedDelivery\TimeoutManager\DispatchTimeoutBehaviorTest.cs" />
     <Compile Include="DelayedDelivery\TimeoutManager\ExpiredTimeoutsPollerTests.cs" />
-    <Compile Include="DelayedDelivery\TimeoutManager\FailureInfoStorageTests.cs" />
     <Compile Include="DelayedDelivery\TimeoutManager\RecordingFakeDispatcher.cs" />
-    <Compile Include="DelayedDelivery\TimeoutManager\TimeoutRecoverabilityBehaviourTest.cs" />
     <Compile Include="DeliveryConstraintContextExtensions\DeliveryConstraintContextExtensionsTests.cs" />
     <Compile Include="Msmq\TimeToBeReceivedOverrideCheckerTest.cs" />
     <Compile Include="Msmq\MsmqExtensionsTests.cs" />
@@ -154,6 +154,7 @@
     <Compile Include="DocumentationTests.cs" />
     <Compile Include="MessageConventionSpecs.cs" />
     <Compile Include="DataBus\InMemoryDataBus.cs" />
+    <Compile Include="Encryption\ValidationTests.cs" />
     <Compile Include="Encryption\When_message_contains_props_and_fields_that_cannot_be_set.cs" />
     <Compile Include="Features\FeatureDefaultsTests.cs" />
     <Compile Include="Recoverability\FirstLevelRetries\FirstLevelRetriesTests.cs" />
@@ -343,9 +344,6 @@
   <ItemGroup>
     <Content Include="TestDlls\NServiceBus.NewCompilerBits.dll" />
     <Content Include="TestDlls\NServiceBus.OldCompilerBits.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

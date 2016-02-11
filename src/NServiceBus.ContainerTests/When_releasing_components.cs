@@ -32,16 +32,15 @@ namespace NServiceBus.ContainerTests
 
         }
 
-        public class TransientClass : IDisposable
+        public class TransientClass
         {
             public static bool Destructed;
 
             public string Name { get; set; }
 
-            public void Dispose()
+            ~TransientClass()
             {
                 Destructed = true;
-                GC.SuppressFinalize(this);
             }
         }
     }

@@ -2,12 +2,12 @@ namespace NServiceBus
 {
     using System;
     using System.Threading.Tasks;
-    using NServiceBus.Pipeline;
+    using Pipeline;
     using Routing;
     using Timeout.Core;
     using Transports;
 
-    class StoreTimeoutBehavior : PipelineTerminator<IIncomingPhysicalMessageContext>
+    class StoreTimeoutBehavior : SatelliteBehavior
     {
         public StoreTimeoutBehavior(ExpiredTimeoutsPoller poller, IDispatchMessages dispatcher, IPersistTimeouts persister, string owningTimeoutManager)
         {
@@ -79,5 +79,15 @@ namespace NServiceBus
         IDispatchMessages dispatcher;
         IPersistTimeouts persister;
         string owningTimeoutManager;
+
+        public class Registration : RegisterStep
+        {
+            public Registration()
+                : base("TimeoutMessageProcessor", typeof(StoreTimeoutBehavior), "Processes timeout messages")
+            {
+                InsertBeforeIfExists("FirstLevelRetries");
+                InsertBeforeIfExists("ReceivePerformanceDiagnosticsBehavior");
+            }
+        }
     }
 }

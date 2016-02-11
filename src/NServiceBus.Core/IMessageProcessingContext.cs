@@ -7,7 +7,7 @@ namespace NServiceBus
     /// <summary>
     /// The context of the currently processed message within the processing pipeline.
     /// </summary>
-    public interface IMessageProcessingContext : IPipelineContext
+    public interface IMessageProcessingContext : IBusContext
     {
         /// <summary>
         /// The Id of the currently processed message.

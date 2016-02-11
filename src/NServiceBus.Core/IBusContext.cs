@@ -5,9 +5,9 @@ namespace NServiceBus
     using NServiceBus.Extensibility;
 
     /// <summary>
-    /// The context for the current message handling pipeline.
+    /// The current context of the bus.
     /// </summary>
-    public interface IPipelineContext : IExtendable
+    public interface IBusContext : IExtendable
     {
         /// <summary>
         /// Sends the provided message.

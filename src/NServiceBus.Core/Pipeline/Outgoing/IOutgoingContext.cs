@@ -5,7 +5,7 @@
     /// <summary>
     /// The base interface for everything inside the outgoing pipeline.
     /// </summary>
-    public interface IOutgoingContext : IBehaviorContext, IPipelineContext
+    public interface IOutgoingContext : IBehaviorContext, IBusContext
     {
         /// <summary>
         /// The id of the outgoing message.

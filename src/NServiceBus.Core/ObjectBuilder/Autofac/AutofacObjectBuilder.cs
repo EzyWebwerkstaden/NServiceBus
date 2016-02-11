@@ -4,13 +4,15 @@ namespace NServiceBus
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Autofac;
-    using Autofac.Builder;
-    using Autofac.Core;
+    using global::Autofac;
+    using global::Autofac.Builder;
+    using global::Autofac.Core;
     using IContainer = NServiceBus.ObjectBuilder.Common.IContainer;
 
     class AutofacObjectBuilder : IContainer
     {
+        ILifetimeScope container;
+
         public AutofacObjectBuilder(ILifetimeScope container)
         {
             this.container = container ?? new ContainerBuilder().Build();
@@ -28,10 +30,7 @@ namespace NServiceBus
 
         public IContainer BuildChildContainer()
         {
-            return new AutofacObjectBuilder(container.BeginLifetimeScope())
-            {
-                isChild = true
-            };
+            return new AutofacObjectBuilder(container.BeginLifetimeScope());
         }
 
         public object Build(Type typeToBuild)
@@ -46,8 +45,6 @@ namespace NServiceBus
 
         void IContainer.Configure(Type component, DependencyLifecycle dependencyLifecycle)
         {
-            ThrowIfCalledOnChildContainer();
-
             var registration = GetComponentRegistration(component);
 
             if (registration != null)
@@ -66,8 +63,6 @@ namespace NServiceBus
 
         void IContainer.Configure<T>(Func<T> componentFactory, DependencyLifecycle dependencyLifecycle)
         {
-            ThrowIfCalledOnChildContainer();
-
             var registration = GetComponentRegistration(typeof(T));
 
             if (registration != null)
@@ -86,8 +81,6 @@ namespace NServiceBus
 
         public void ConfigureProperty(Type component, string property, object value)
         {
-            ThrowIfCalledOnChildContainer();
-
             var registration = GetComponentRegistration(component);
 
             if (registration == null)
@@ -101,8 +94,6 @@ namespace NServiceBus
 
         public void RegisterSingleton(Type lookupType, object instance)
         {
-            ThrowIfCalledOnChildContainer();
-
             var builder = new ContainerBuilder();
             builder.RegisterInstance(instance).As(lookupType).PropertiesAutowired();
             builder.Update(container.ComponentRegistry);
@@ -142,14 +133,6 @@ namespace NServiceBus
             }
         }
 
-        void ThrowIfCalledOnChildContainer()
-        {
-            if (isChild)
-            {
-                throw new InvalidOperationException("Reconfiguration of child containers is not allowed.");
-            }
-        }
-
         IComponentRegistration GetComponentRegistration(Type concreteComponent)
         {
             return container.ComponentRegistry.Registrations.FirstOrDefault(x => x.Activator.LimitType == concreteComponent);
@@ -163,9 +146,9 @@ namespace NServiceBus
             }
 
             var result = new List<Type>(type.GetInterfaces())
-            {
-                type
-            };
+                         {
+                             type
+                         };
 
             foreach (var interfaceType in type.GetInterfaces())
             {
@@ -179,8 +162,5 @@ namespace NServiceBus
         {
             return container.Resolve(typeof(IEnumerable<>).MakeGenericType(componentType)) as IEnumerable<object>;
         }
-
-        ILifetimeScope container;
-        bool isChild;
     }
 }

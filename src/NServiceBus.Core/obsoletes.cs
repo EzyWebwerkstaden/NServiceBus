@@ -34,7 +34,6 @@ namespace NServiceBus
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using NServiceBus.Encryption;
     using NServiceBus.ObjectBuilder;
 
     public static partial class ConfigureCriticalErrorAction
@@ -123,10 +122,12 @@ namespace NServiceBus
         ReplacementTypeOrMember = "EndpointConfiguration",
         RemoveInVersion = "7.0",
         TreatAsErrorFromVersion = "6.0")]
-    public class BusConfiguration
+    public class BusConfiguration { }
+
+    public partial class EndpointConfiguration
     {
         [ObsoleteEx(
-            ReplacementTypeOrMember = "EndpointConfiguration.AddHeaderToAllOutgoingMessages(string key,string value)",
+            ReplacementTypeOrMember = "SetOutgoingHeaders(string key,string value)",
             RemoveInVersion = "7.0",
             TreatAsErrorFromVersion = "6.0")]
         public IDictionary<string, string> OutgoingHeaders
@@ -137,7 +138,7 @@ namespace NServiceBus
         [ObsoleteEx(
             TreatAsErrorFromVersion = "6",
             RemoveInVersion = "7",
-            ReplacementTypeOrMember = "EndpointConfiguration.ExcludeTypes")]
+            ReplacementTypeOrMember = "ExcludeTypes")]
         public void TypesToScan(IEnumerable<Type> typesToScan)
         {
             throw new NotImplementedException();
@@ -146,7 +147,7 @@ namespace NServiceBus
         [ObsoleteEx(
             TreatAsErrorFromVersion = "6",
             RemoveInVersion = "7",
-            ReplacementTypeOrMember = "EndpointConfiguration.ExcludeAssemblies")]
+            ReplacementTypeOrMember = "ExcludeAssemblies")]
         public void AssembliesToScan(IEnumerable<Assembly> assemblies)
         {
             throw new NotImplementedException();
@@ -155,7 +156,7 @@ namespace NServiceBus
         [ObsoleteEx(
             TreatAsErrorFromVersion = "6",
             RemoveInVersion = "7",
-            ReplacementTypeOrMember = "EndpointConfiguration.ExcludeAssemblies")]
+            ReplacementTypeOrMember = "ExcludeAssemblies")]
         public void AssembliesToScan(params Assembly[] assemblies)
         {
             throw new NotImplementedException();
@@ -164,14 +165,14 @@ namespace NServiceBus
         [ObsoleteEx(
             TreatAsErrorFromVersion = "6",
             RemoveInVersion = "7",
-            ReplacementTypeOrMember = "EndpointConfiguration.ExcludeAssemblies")]
+            ReplacementTypeOrMember = "ExcludeAssemblies")]
         public void ScanAssembliesInDirectory(string probeDirectory)
         {
             throw new NotImplementedException();
         }
 
         [ObsoleteEx(
-            ReplacementTypeOrMember = "EndpointConfiguration.OverridePublicReturnAddress(string address)",
+            ReplacementTypeOrMember = "OverridePublicReturnAddress(string address)",
             RemoveInVersion = "7.0",
             TreatAsErrorFromVersion = "6.0")]
         public void OverridePublicReturnAddress(Address address)
@@ -180,7 +181,7 @@ namespace NServiceBus
         }
 
         [ObsoleteEx(
-            ReplacementTypeOrMember = "EndpointConfiguration.UseTransport<T>().AddAddressTranslationRule(Func<LogicalAddress, string> rule)",
+            ReplacementTypeOrMember = "UseTransport<T>().AddAddressTranslationRule",
             RemoveInVersion = "7.0",
             TreatAsErrorFromVersion = "6.0")]
         public void OverrideLocalAddress(string queue)
@@ -188,7 +189,7 @@ namespace NServiceBus
             throw new NotImplementedException();
         }
     }
-    
+
     [ObsoleteEx(
         Message = "This is no longer a public API",
         RemoveInVersion = "7.0",

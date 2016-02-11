@@ -61,9 +61,6 @@
     <Compile Include="Causation\When_a_message_is_audited.cs" />
     <Compile Include="ConfigureInMemoryPersistence.cs" />
     <Compile Include="DelayedDelivery\When_deferring_a_message_to_the_past.cs" />
-    <Compile Include="DelayedDelivery\TimeoutManager\When_timeout_dispatch_fails.cs" />
-    <Compile Include="DelayedDelivery\TimeoutManager\When_timeout_dispatch_fails_on_timeout_data_removal.cs" />
-    <Compile Include="DelayedDelivery\TimeoutManager\When_timeout_storage_fails.cs" />
     <Compile Include="FakeTransport\CriticalError\When_registering_custom_critical_error_handler.cs" />
     <Compile Include="FakeTransport\FakeDispatcher.cs" />
     <Compile Include="FakeTransport\FakeQueueCreator.cs" />
@@ -83,7 +80,7 @@
     <Compile Include="Msmq\When_publishing.cs" />
     <Compile Include="Msmq\When_setting_msmq_label_generator.cs" />
     <Compile Include="Basic\When_deferring_to_non_local.cs" />
-    <Compile Include="DelayedDelivery\TimeoutManager\When_TimeoutManager_is_disabled.cs" />
+    <Compile Include="DelayedDelivery\When_TimeoutManager_is_disabled.cs" />
     <Compile Include="Msmq\When_starting_up_the_endpoint.cs" />
     <Compile Include="Msmq\When_using_scope_timeout_greater_than_machine_max.cs" />
     <Compile Include="Mutators\When_mutating.cs" />
@@ -135,6 +132,7 @@
     <Compile Include="Reliability\Outbox\When_a_message_is_audited.cs" />
     <Compile Include="Reliability\Outbox\When_clearing_saga_timeouts.cs" />
     <Compile Include="Reliability\Outbox\When_dispatching_transport_operations.cs" />
+    <Compile Include="Encryption\When_using_Rijndael_without_incoming_key_identifier.cs" />
     <Compile Include="PerfMon\CriticalTime\When_deferring_a_message.cs" />
     <Compile Include="Audit\When_audit_is_overridden_in_code.cs" />
     <Compile Include="Reliability\Outbox\When_receiving_messages_already_dispatched.cs" />
@@ -288,9 +286,6 @@
       <Project>{758357f6-cd31-4337-80c4-ba377fc257af}</Project>
       <Name>NServiceBus.AcceptanceTesting</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

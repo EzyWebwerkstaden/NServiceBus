@@ -17,8 +17,9 @@
 
         protected internal override void Setup(FeatureConfigurationContext context)
         {
-            context.Pipeline.Register("TransportReceiveToPhysicalMessageProcessingConnector", typeof(TransportReceiveToPhysicalMessageProcessingConnector), "Allows to abort processing the message");
-            context.Pipeline.Register("LoadHandlersConnector", typeof(LoadHandlersConnector), "Gets all the handlers to invoke from the MessageHandler registry based on the message type.");
+            context.Pipeline.RegisterConnector<TransportReceiveToPhysicalMessageProcessingConnector>("Allows to abort processing the message");
+            context.Pipeline.RegisterConnector<LoadHandlersConnector>("Gets all the handlers to invoke from the MessageHandler registry based on the message type.");
+
 
             context.Pipeline
                 .Register(WellKnownStep.ExecuteUnitOfWork, typeof(UnitOfWorkBehavior), "Executes the UoW")
@@ -29,7 +30,7 @@
             context.Container.ConfigureComponent(b =>
             {
                 var storage = context.Container.HasComponent<IOutboxStorage>() ? b.Build<IOutboxStorage>() : new NoOpOutbox();
-
+                
                 return new TransportReceiveToPhysicalMessageProcessingConnector(storage);
             }, DependencyLifecycle.InstancePerCall);
 
@@ -42,6 +43,8 @@
 
         class NoOpAdaper : ISynchronizedStorageAdapter
         {
+            static readonly Task<CompletableSynchronizedStorageSession> EmptyResult = Task.FromResult<CompletableSynchronizedStorageSession>(null);
+
             public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
             {
                 return EmptyResult;
@@ -51,8 +54,6 @@
             {
                 return EmptyResult;
             }
-
-            static readonly Task<CompletableSynchronizedStorageSession> EmptyResult = Task.FromResult<CompletableSynchronizedStorageSession>(null);
         }
 
         class NoOpOutbox : IOutboxStorage
@@ -79,7 +80,6 @@
 
             static Task<OutboxMessage> NoOutboxMessageTask = Task.FromResult<OutboxMessage>(null);
         }
-
         class NoOpOutboxTransaction : OutboxTransaction
         {
             public void Dispose()
