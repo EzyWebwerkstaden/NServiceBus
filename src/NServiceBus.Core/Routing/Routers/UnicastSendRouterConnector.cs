@@ -100,9 +100,22 @@ namespace NServiceBus
 
         public class State
         {
+            RouteOption option;
             public string ExplicitDestination { get; set; }
             public string SpecificInstance { get; set; }
-            public RouteOption Option { get; set; }
+
+            public RouteOption Option
+            {
+                get { return option; }
+                set
+                {
+                    if (option != RouteOption.None)
+                    {
+                        throw new Exception("Already specified routing option for this message: " + option);
+                    }
+                    option = value;
+                }
+            }
         }
         public enum RouteOption
         {

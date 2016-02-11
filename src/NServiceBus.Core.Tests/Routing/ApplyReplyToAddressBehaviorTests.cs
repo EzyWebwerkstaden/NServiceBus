@@ -16,8 +16,6 @@
             var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", "PublicAddress");
             var context = CreateContext();
 
-            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToAnyInstance = true;
-
             await behavior.Invoke(context, () => TaskEx.CompletedTask);
 
             Assert.AreEqual("PublicAddress", context.Headers[Headers.ReplyToAddress]);
@@ -53,7 +51,7 @@
             var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
             var context = CreateContext();
 
-            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToAnyInstance = true;
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToAnyInstanceOfThisEndpoint;
 
             await behavior.Invoke(context, () => TaskEx.CompletedTask);
 
@@ -66,7 +64,7 @@
             var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
             var context = CreateContext();
 
-            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToThisInstance = true;
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
 
             await behavior.Invoke(context, () => TaskEx.CompletedTask);
 
@@ -79,7 +77,7 @@
             var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", null, null);
             var context = CreateContext();
 
-            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToThisInstance = true;
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
 
             try
             {
@@ -98,11 +96,11 @@
             var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null);
             var context = CreateContext();
 
-            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToThisInstance = true;
-            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().RouteReplyToAnyInstance = true;
-
             try
             {
+                context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToAnyInstanceOfThisEndpoint;
+                context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
+
                 await behavior.Invoke(context, () => TaskEx.CompletedTask);
                 Assert.Fail("Expected exception");
             }

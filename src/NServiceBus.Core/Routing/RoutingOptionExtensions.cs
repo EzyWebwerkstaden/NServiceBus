@@ -72,7 +72,7 @@
         public static void RouteReplyToThisInstance(this SendOptions option)
         {
             option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
-                .RouteReplyToThisInstance = true;
+                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
         }
         
         /// <summary>
@@ -82,7 +82,7 @@
         public static void RouteReplyToAnyInstance(this SendOptions option)
         {
             option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
-                .RouteReplyToAnyInstance = true;
+                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteToAnyInstanceOfThisEndpoint;
         }
 
         /// <summary>
@@ -92,7 +92,7 @@
         public static void RouteReplyToThisInstance(this ReplyOptions option)
         {
             option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
-                .RouteReplyToThisInstance = true;
+                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
         }
         
         /// <summary>
@@ -102,7 +102,33 @@
         public static void RouteReplyToAnyInstance(this ReplyOptions option)
         {
             option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
-                .RouteReplyToAnyInstance = true;
+                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteToAnyInstanceOfThisEndpoint;
+        }
+
+        /// <summary>
+        /// Instructs the receiver to route the reply to specified address.
+        /// </summary>
+        /// <param name="option">Context being extended.</param>
+        /// <param name="address">Reply destination.</param>
+        public static void RouteReplyTo(this ReplyOptions option, string address)
+        {
+            Guard.AgainstNull(nameof(address), address);
+            var state = option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>();
+            state.Option = ApplyReplyToAddressBehavior.RouteOption.ExplicitDestination;
+            state.ExplicitDestination = address;
+        }
+
+        /// <summary>
+        /// Instructs the receiver to route the reply to specified address.
+        /// </summary>
+        /// <param name="option">Context being extended.</param>
+        /// <param name="address">Reply destination.</param>
+        public static void RouteReplyTo(this SendOptions option, string address)
+        {
+            Guard.AgainstNull(nameof(address), address);
+            var state = option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>();
+            state.Option = ApplyReplyToAddressBehavior.RouteOption.ExplicitDestination;
+            state.ExplicitDestination = address;
         }
     }
 }
