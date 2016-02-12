@@ -14,16 +14,15 @@
             return AcceptanceTesting.Customization.Conventions.EndpointNamingConvention(typeof(Receiver));
         }
 
-
         [Test]
         public async Task Should_be_addressable_both_by_shared_queue_and_specific_queue()
         {
             var context = await Scenario.Define<Context>()
-                    .WithEndpoint<Receiver>()
-                    .WithEndpoint<UnawareSender>(b => b.When(s => s.Send(new MyMessage())))
-                    .WithEndpoint<AwareSender>(b => b.When(s => s.Send(new MyMessage())))
-                    .Done(c => c.MessagesReceived > 1)
-                    .Run();
+                .WithEndpoint<Receiver>()
+                .WithEndpoint<UnawareSender>(b => b.When(s => s.Send(new MyMessage())))
+                .WithEndpoint<AwareSender>(b => b.When(s => s.Send(new MyMessage())))
+                .Done(c => c.MessagesReceived > 1)
+                .Run();
 
             Assert.AreEqual(2, context.MessagesReceived);
         }
@@ -37,16 +36,12 @@
         {
             public UnawareSender()
             {
-                EndpointSetup<DefaultServer>(c =>
-                {
-                    c.Routing().UnicastRoutingTable.RouteToEndpoint(typeof(MyMessage), GetReceiverEndpoint());
-                });
+                EndpointSetup<DefaultServer>(c => { c.Routing().UnicastRoutingTable.RouteToEndpoint(typeof(MyMessage), GetReceiverEndpoint()); });
             }
         }
 
         public class AwareSender : EndpointConfigurationBuilder
         {
-
             public AwareSender()
             {
                 EndpointSetup<DefaultServer>(c =>
@@ -59,15 +54,10 @@
 
         public class Receiver : EndpointConfigurationBuilder
         {
-
             public Receiver()
             {
-                EndpointSetup<DefaultServer>(c =>
-                {
-                    c.ScaleOut().InstanceDiscriminator("XYZ");
-                });
+                EndpointSetup<DefaultServer>(c => { c.ScaleOut().InstanceDiscriminator("XYZ"); });
             }
-            
 
             public class MyMessageHandler : IHandleMessages<MyMessage>
             {

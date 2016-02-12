@@ -16,10 +16,10 @@
         public async Task Reply_address_should_be_set_to_that_specific_instance()
         {
             var context = await Scenario.Define<Context>()
-                    .WithEndpoint<Receiver>()
-                    .WithEndpoint<Sender>(b => b.When(s => s.Send(new MyRequest())))
-                    .Done(c => c.ReplyToAddress != null)
-                    .Run();
+                .WithEndpoint<Receiver>()
+                .WithEndpoint<Sender>(b => b.When(s => s.Send(new MyRequest())))
+                .Done(c => c.ReplyToAddress != null)
+                .Run();
 
             Assert.IsTrue(context.ReplyToAddress.IndexOf("XYZ", StringComparison.OrdinalIgnoreCase) != -1);
         }
@@ -28,10 +28,9 @@
         {
             public string ReplyToAddress { get; set; }
         }
-        
+
         public class Sender : EndpointConfigurationBuilder
         {
-
             public Sender()
             {
                 EndpointSetup<DefaultServer>(c =>
@@ -55,15 +54,10 @@
 
         public class Receiver : EndpointConfigurationBuilder
         {
-
             public Receiver()
             {
-                EndpointSetup<DefaultServer>(c =>
-                {
-                    c.ScaleOut().InstanceDiscriminator("XYZ");
-                });
+                EndpointSetup<DefaultServer>(c => { c.ScaleOut().InstanceDiscriminator("XYZ"); });
             }
-            
 
             public class MyRequestHandler : IHandleMessages<MyRequest>
             {
@@ -80,7 +74,6 @@
 
         public class MyResponse : IMessage
         {
-            
         }
     }
 }

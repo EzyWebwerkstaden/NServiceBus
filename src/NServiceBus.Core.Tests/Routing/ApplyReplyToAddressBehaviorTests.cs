@@ -2,9 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Threading.Tasks;
     using NServiceBus.Pipeline;
     using NServiceBus.Routing;
+    using NServiceBus.Transports;
     using NUnit.Framework;
 
     [TestFixture]
@@ -46,12 +48,12 @@
         }
 
         [Test]
-        public async Task Should_set_the_reply_to_header_to_this_endpoint()
+        public async Task Should_set_the_reply_to_header_to_this_endpoint_when_requested()
         {
             var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null, null);
             var context = CreateContext();
 
-            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToAnyInstanceOfThisEndpoint;
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToAnyInstanceOfThisEndpoint;
 
             await behavior.Invoke(context, () => TaskEx.CompletedTask);
 
@@ -59,12 +61,12 @@
         }
 
         [Test]
-        public async Task Should_set_the_reply_to_header_to_this_instance()
+        public async Task Should_set_the_reply_to_header_to_this_instance_when_requested()
         {
             var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", null, null);
             var context = CreateContext();
 
-            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToThisInstance;
 
             await behavior.Invoke(context, () => TaskEx.CompletedTask);
 
@@ -77,9 +79,13 @@
             var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", "MyInstance", "MyPublicAddress", "MyDistributor");
             var context = CreateContext();
 
+            context.Set(new IncomingMessage("ID", new Dictionary<string, string>
+            {
+                { LegacyDistributorHeaders.WorkerSessionId, "SessionID" }
+            }, new MemoryStream()));
+
             var state = context.GetOrCreate<ApplyReplyToAddressBehavior.State>();
-            state.FromDistributor = true;
-            state.Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
+            state.Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToThisInstance;
 
             await behavior.Invoke(context, () => TaskEx.CompletedTask);
 
@@ -92,7 +98,7 @@
             var behavior = new ApplyReplyToAddressBehavior("MyEndpoint", null, null, null);
             var context = CreateContext();
 
-            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
+            context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToThisInstance;
 
             try
             {
@@ -113,8 +119,8 @@
 
             try
             {
-                context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToAnyInstanceOfThisEndpoint;
-                context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
+                context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToAnyInstanceOfThisEndpoint;
+                context.GetOrCreate<ApplyReplyToAddressBehavior.State>().Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToThisInstance;
 
                 await behavior.Invoke(context, () => TaskEx.CompletedTask);
                 Assert.Fail("Expected exception");

@@ -15,7 +15,6 @@
 
             context.RegisterStartupTask(b => b.Build<ReadyMessageSender>());
             context.Pipeline.Register("ProcessedMessageCounterBehavior", typeof(ProcessedMessageCounterBehavior), "Counts messages processed by the worker.");
-            context.Pipeline.Register("DetectDistributorDistributorBehavior", new DetectDistributorDistributorBehavior(), "Detects if message is coming from a distributor.");
         }
     }
 }

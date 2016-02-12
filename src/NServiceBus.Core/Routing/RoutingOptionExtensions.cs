@@ -72,7 +72,7 @@
         public static void RouteReplyToThisInstance(this SendOptions option)
         {
             option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
-                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
+                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToThisInstance;
         }
         
         /// <summary>
@@ -82,7 +82,7 @@
         public static void RouteReplyToAnyInstance(this SendOptions option)
         {
             option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
-                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteToAnyInstanceOfThisEndpoint;
+                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToAnyInstanceOfThisEndpoint;
         }
 
         /// <summary>
@@ -92,7 +92,7 @@
         public static void RouteReplyToThisInstance(this ReplyOptions option)
         {
             option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
-                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteToThisInstance;
+                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToThisInstance;
         }
         
         /// <summary>
@@ -102,7 +102,7 @@
         public static void RouteReplyToAnyInstance(this ReplyOptions option)
         {
             option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>()
-                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteToAnyInstanceOfThisEndpoint;
+                .Option = ApplyReplyToAddressBehavior.RouteOption.RouteReplyToAnyInstanceOfThisEndpoint;
         }
 
         /// <summary>
@@ -114,7 +114,7 @@
         {
             Guard.AgainstNull(nameof(address), address);
             var state = option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>();
-            state.Option = ApplyReplyToAddressBehavior.RouteOption.ExplicitDestination;
+            state.Option = ApplyReplyToAddressBehavior.RouteOption.ExplicitReplyDestination;
             state.ExplicitDestination = address;
         }
 
@@ -127,7 +127,7 @@
         {
             Guard.AgainstNull(nameof(address), address);
             var state = option.Context.GetOrCreate<ApplyReplyToAddressBehavior.State>();
-            state.Option = ApplyReplyToAddressBehavior.RouteOption.ExplicitDestination;
+            state.Option = ApplyReplyToAddressBehavior.RouteOption.ExplicitReplyDestination;
             state.ExplicitDestination = address;
         }
     }

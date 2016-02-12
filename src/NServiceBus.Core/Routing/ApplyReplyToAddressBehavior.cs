@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
     using NServiceBus.Pipeline;
+    using NServiceBus.Transports;
 
     class ApplyReplyToAddressBehavior : Behavior<IOutgoingLogicalMessageContext>
     {
@@ -18,14 +19,15 @@
         public override Task Invoke(IOutgoingLogicalMessageContext context, Func<Task> next)
         {
             var state = context.Extensions.GetOrCreate<State>();            
-            if (state.Option == RouteOption.RouteToThisInstance && instanceSpecificQueue == null)
+            if (state.Option == RouteOption.RouteReplyToThisInstance && instanceSpecificQueue == null)
             {
                 throw new InvalidOperationException("Cannot route a reply to this specific instance because endpoint instance ID was not provided by either host, a plugin or user. You can specify it via BusConfiguration.EndpointInstanceId, use a specific host or plugin.");
             }
             context.Headers[Headers.ReplyToAddress] = ApplyUserOverride(publicReturnAddress ?? GetDefaultReplyToValue(context), state);
 
             //Legacy distributor logic
-            if (state.FromDistributor)
+            IncomingMessage incomingMessage;
+            if (context.TryGetIncomingPhysicalMessage(out incomingMessage) && incomingMessage.Headers.ContainsKey(LegacyDistributorHeaders.WorkerSessionId))
             {
                 context.Headers[Headers.ReplyToAddress] = distributorAddress;
             }
@@ -35,15 +37,15 @@
 
         string ApplyUserOverride(string replyTo, State state)
         {
-            if (state.Option == RouteOption.RouteToAnyInstanceOfThisEndpoint)
+            if (state.Option == RouteOption.RouteReplyToAnyInstanceOfThisEndpoint)
             {
                 replyTo = sharedQueue;
             }
-            else if (state.Option == RouteOption.RouteToThisInstance)
+            else if (state.Option == RouteOption.RouteReplyToThisInstance)
             {
                 replyTo = instanceSpecificQueue;
             }
-            else if (state.Option == RouteOption.ExplicitDestination)
+            else if (state.Option == RouteOption.ExplicitReplyDestination)
             {
                 replyTo = state.ExplicitDestination;
             }
@@ -81,17 +83,14 @@
             }
 
             public string ExplicitDestination { get; set; }
-            
-            //Legacy distributor
-            public bool FromDistributor { get; set; }
         }
 
         public enum RouteOption
         {
             None,
-            ExplicitDestination,
-            RouteToThisInstance,
-            RouteToAnyInstanceOfThisEndpoint,
+            ExplicitReplyDestination,
+            RouteReplyToThisInstance,
+            RouteReplyToAnyInstanceOfThisEndpoint,
         }
     }
 }

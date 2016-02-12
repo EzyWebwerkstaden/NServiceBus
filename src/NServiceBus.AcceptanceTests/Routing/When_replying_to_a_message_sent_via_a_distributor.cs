@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus.AcceptanceTests.ScaleOut
 {
-    using System;
     using System.Threading.Tasks;
     using NServiceBus.AcceptanceTesting;
     using NServiceBus.AcceptanceTesting.Customization;
@@ -15,12 +14,12 @@
         public async Task Reply_address_should_be_set_to_that_specific_instance()
         {
             var context = await Scenario.Define<Context>()
-                    .WithEndpoint<Receiver>()
-                    .WithEndpoint<Sender>(b => b.When(s => s.Send(new MyRequest())))
-                    .Done(c => c.ReplyToAddress != null)
-                    .Run();
+                .WithEndpoint<Receiver>()
+                .WithEndpoint<Sender>(b => b.When(s => s.Send(new MyRequest())))
+                .Done(c => c.ReplyToAddress != null)
+                .Run();
 
-            Assert.IsTrue(context.ReplyToAddress.IndexOf("Distributor", StringComparison.OrdinalIgnoreCase) != -1);
+            StringAssert.Contains("Distributor", context.ReplyToAddress);
         }
 
         static string ReceiverEndpoint => Conventions.EndpointNamingConvention(typeof(Receiver));
@@ -29,10 +28,9 @@
         {
             public string ReplyToAddress { get; set; }
         }
-        
+
         public class Sender : EndpointConfigurationBuilder
         {
-
             public Sender()
             {
                 EndpointSetup<DefaultServer>(c =>
@@ -57,7 +55,6 @@
 
         public class Receiver : EndpointConfigurationBuilder
         {
-
             public Receiver()
             {
                 EndpointSetup<DefaultServer>(c =>
@@ -66,7 +63,7 @@
                     c.EnlistWithLegacyMSMQDistributor("Distributor", ReceiverEndpoint, 1);
                 });
             }
-            
+
 
             public class MyRequestHandler : IHandleMessages<MyRequest>
             {
@@ -83,7 +80,6 @@
 
         public class MyResponse : IMessage
         {
-            
         }
     }
 }
