@@ -6,7 +6,10 @@
     /// </summary>
     public class InMemorySagaPersistence : Feature
     {
-        internal InMemorySagaPersistence()
+        /// <summary>
+        /// ctor for InMemorySagaPersistence
+        /// </summary>
+        protected InMemorySagaPersistence()
         {
             DependsOn<Sagas>();
             Defaults(s => s.EnableFeature(typeof(InMemoryTransactionalStorageFeature)));

@@ -8,7 +8,10 @@
     /// </summary>
     public class InMemoryPersistence : PersistenceDefinition
     {
-        internal InMemoryPersistence()
+        /// <summary>
+        /// Ctor for InMemoryPersistence
+        /// </summary>
+        protected InMemoryPersistence()
         {
             Supports<StorageType.Sagas>(s => s.EnableFeatureByDefault<InMemorySagaPersistence>());
             Supports<StorageType.Timeouts>(s => s.EnableFeatureByDefault<InMemoryTimeoutPersistence>());

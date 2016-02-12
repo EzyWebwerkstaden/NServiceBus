@@ -9,8 +9,14 @@ namespace NServiceBus
     using NServiceBus.Persistence;
     using NServiceBus.Sagas;
 
-    class InMemorySagaPersister : ISagaPersister
+    /// <summary>
+    /// 
+    /// </summary>
+    public class InMemorySagaPersister : ISagaPersister
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
         {
             var inMemSession = (InMemorySynchronizedStorageSession)session;
@@ -22,6 +28,9 @@ namespace NServiceBus
             return TaskEx.CompletedTask;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context) where TSagaData : IContainSagaData
         {
             Guard.AgainstNull(nameof(propertyValue), propertyValue);
@@ -46,7 +55,9 @@ namespace NServiceBus
             }
             return Task.FromResult(default(TSagaData));
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context) where TSagaData : IContainSagaData
         {
             VersionedSagaEntity result;
@@ -58,7 +69,9 @@ namespace NServiceBus
             }
             return Task.FromResult(default(TSagaData));
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
         {
             var inMemSession = (InMemorySynchronizedStorageSession) session;
@@ -88,7 +101,9 @@ namespace NServiceBus
             });
             return TaskEx.CompletedTask;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
         {
             var inMemSession = (InMemorySynchronizedStorageSession)session;
@@ -140,7 +155,12 @@ namespace NServiceBus
             }
         }
 
-        IContainSagaData DeepClone(IContainSagaData source)
+        /// <summary>
+        /// used for deep cloning the SagaData with Json serialization
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        protected virtual IContainSagaData DeepClone(IContainSagaData source)
         {
             var json = serializer.SerializeObject(source);
             return (IContainSagaData) serializer.DeserializeObject(json, source.GetType());
